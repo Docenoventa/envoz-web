@@ -12,7 +12,7 @@
   var CATEGORIES = [
     { slug: 'entre-voces', name: 'Entre Voces' },
     { slug: 'agenda-publica', name: 'Agenda Pública' },
-    { slug: 'estados-cdmx', name: 'Estados / CDMX' },
+    { slug: 'estados-cdmx', name: 'Estados / CDMX', local: 'estados.html' },
     { slug: 'internacional', name: 'Internacional' },
     { slug: 'tendencias', name: 'Tendencias' },
     { slug: 'negocios', name: 'Negocios', local: 'negocios.html', isNew: true },
@@ -34,6 +34,20 @@
       return TOPICS[topic].test(text);
     }).sort(function (x, y) { return String(y.publishAt).localeCompare(String(x.publishAt)); }).slice(0, max || 12);
   }
+  var REGIONS = [
+    { slug: 'cdmx', name: 'Ciudad de México', group: 'Ciudad de México' },
+    { slug: 'cuauhtemoc', name: 'Cuauhtémoc', group: 'Ciudad de México' },
+    { slug: 'benito-juarez', name: 'Benito Juárez', group: 'Ciudad de México' },
+    { slug: 'miguel-hidalgo', name: 'Miguel Hidalgo', group: 'Ciudad de México' },
+    { slug: 'alvaro-obregon', name: 'Álvaro Obregón', group: 'Ciudad de México' },
+    { slug: 'cuajimalpa', name: 'Cuajimalpa', group: 'Ciudad de México' },
+    { slug: 'estados', name: 'Estados', group: 'Estados' },
+    { slug: 'estado-de-mexico', name: 'Estado de México', group: 'Estados' },
+    { slug: 'morelos', name: 'Morelos', group: 'Estados' },
+    { slug: 'oaxaca', name: 'Oaxaca', group: 'Estados' },
+    { slug: 'zacatecas', name: 'Zacatecas', group: 'Estados' }
+  ];
+  function regionBySlug(slug) { for (var i = 0; i < REGIONS.length; i++) if (REGIONS[i].slug === slug) return REGIONS[i]; return null; }
   var CATEGORY_IDS = {
     'agenda-publica': '17918dd6-dd4a-4a03-a646-7c5c723cbdf6',
     'estados-cdmx': 'c66af518-0f1f-4c73-aad3-455e8d04d001',
@@ -300,6 +314,20 @@
     else next = 'el lunes a las 7:30 h';
     return next;
   }
+  // Franja "Lo que va de la mañanera": temas que el equipo aprobó en el back office (maqueta con datos del 24 nov 2026)
+  function liveTopics() {
+    var D = window.MANANERA_DEMO;
+    if (!D) return '';
+    var cortes = {}; D.cortes.forEach(function (c) { cortes[c.id] = c; });
+    var items = D.temas.slice().reverse().map(function (t) {
+      return '<li><span class="lt-time">' + esc(cortes[t.corte].rango) + '</span><span class="lt-sec">' + esc(t.seccion) + '</span>' +
+        '<a href="' + LIVE_URL + '" target="_blank" rel="noopener">' + esc(t.titulo) + '</a></li>';
+    }).join('');
+    return '<div class="live-topics mejora" data-mejora="Nuevo: resumen con IA">' +
+      '<div class="lt-head"><h3>Lo que va de la mañanera</h3><span>Actualizado cada 30 minutos · Ejemplo con la conferencia del 24 nov 2026</span></div>' +
+      '<ol>' + items + '</ol></div>';
+  }
+
   function liveBox() {
     var st = liveStatus();
     var isLive = st === 'live';
@@ -331,19 +359,82 @@
           (st === 'replay' ? ' La transmisión de hoy ya terminó: aquí puedes ver la repetición y los videos más recientes del canal.' : '') + '</p>' +
         '<a class="btn btn-red" href="' + (st === 'replay' ? LIVE_CHANNEL_URL : LIVE_URL) + '" target="_blank" rel="noopener">' + (st === 'replay' ? 'Ver la repetición en YouTube' : 'Ver en vivo en YouTube') + '</a>' +
         '<span class="live-source">Transmisión del canal oficial @ClaudiaSheinbaumP</span>' +
-      '</div></section>';
+      '</div>' + liveTopics() + '</section>';
   }
 
   /* ---------------- Espacio publicitario ---------------- */
-  function adSlot(id, size) {
-    return '<aside class="ad-slot' + (size ? ' ad-' + size : '') + ' mejora" data-mejora="Nuevo: publicidad" id="ad-' + id + '" aria-label="Espacio publicitario">' +
+  function adSlot(id, size, region) {
+    var title = region ? 'Anúnciate en ' + region : 'Espacio disponible para publicitar';
+    var text = region ? 'Espacio disponible: llega a los lectores de ' + region + '.' : 'Tu marca aquí, frente a miles de lectores cada día.';
+    return '<aside class="ad-slot' + (size ? ' ad-' + size : '') + ' mejora" data-mejora="Nuevo: publicidad" id="ad-' + esc(id) + '" aria-label="Espacio publicitario">' +
       '<span class="ad-label">Publicidad</span>' +
       '<a class="ad-box" href="anunciate.html">' +
-        '<span class="ad-title">Espacio disponible para publicitar</span>' +
-        '<span class="ad-text">Tu marca aquí, frente a miles de lectores cada día.</span>' +
+        '<span class="ad-title">' + esc(title) + '</span>' +
+        '<span class="ad-text">' + esc(text) + '</span>' +
         '<span class="ad-cta">Anúnciate con nosotros →</span>' +
         (size === 'grande' ? '<span class="ad-size">Formato grande · 970 × 250</span>' : '<span class="ad-size">Banner · 970 × 90</span>') +
       '</a></aside>';
+  }
+
+  /* ---------------- Estados y alcaldías (estados.html, region.html?c=slug) ---------------- */
+  function byRegion(slug, n) {
+    return fetch(API + 'get-highlighted-articles/category/' + encodeURIComponent(slug)).then(function (r) { return r.json(); }).then(function (j) {
+      var first = (j.data && j.data.articles || []).map(slim);
+      var cat = j.data && j.data.category;
+      if (!cat || !n || n <= first.length) return first;
+      return getJSON('latest-articles?categoryId=' + cat.categoryId + '&pagination%5Bpage%5D=1&pagination%5BrowsPerPage%5D=' + n).then(function (more) {
+        var seen = {}; return first.concat(more).filter(function (a) { if (seen[a.slug]) return false; seen[a.slug] = true; return true; });
+      }).catch(function () { return first; });
+    });
+  }
+  function regionChips(current) {
+    var groups = {};
+    REGIONS.forEach(function (r) { (groups[r.group] = groups[r.group] || []).push(r); });
+    return '<nav class="region-chips" aria-label="Estados y alcaldías">' + Object.keys(groups).map(function (g) {
+      return '<div><span>' + esc(g) + '</span>' + groups[g].map(function (r) {
+        return '<a href="region.html?c=' + r.slug + '"' + (r.slug === current ? ' aria-current="page"' : '') + '>' + esc(r.name) + '</a>';
+      }).join('') + '</div>';
+    }).join('') + '</nav>';
+  }
+  function renderEstados() {
+    var root = document.getElementById('estados-page');
+    if (!root) return;
+    var html = regionChips('') + adSlot('estados-superior');
+    root.innerHTML = html + '<div id="estados-lista"><p class="search-hint">Cargando notas por estado y alcaldía…</p></div>';
+    var list = REGIONS.filter(function (r) { return r.slug !== 'estados' && r.slug !== 'cdmx'; });
+    Promise.all(list.map(function (r) { return byRegion(r.slug, 0).catch(function () { return []; }); })).then(function (res) {
+      var out = '', shown = 0;
+      list.forEach(function (r, i) {
+        var arts = (res[i] || []).slice(0, 3);
+        if (!arts.length) return;
+        remember(arts);
+        out += '<section class="section" aria-labelledby="reg-' + r.slug + '">' + sectionHead(r.name, 'reg-' + r.slug) +
+          '<div class="grid-3">' + arts.map(carouselCard).join('') + '</div>' +
+          '<a class="see-all" href="region.html?c=' + r.slug + '">Ver todas de ' + esc(r.name) + '</a></section>';
+        shown++;
+        if (shown % 2 === 0) out += adSlot('estados-' + r.slug, '', r.group === 'Estados' ? 'los estados' : 'la Ciudad de México');
+      });
+      document.getElementById('estados-lista').innerHTML = out || '<p class="notice">No se pudieron cargar las notas en este momento.</p>';
+    });
+  }
+  function renderRegion() {
+    var root = document.getElementById('region-page');
+    if (!root) return;
+    var m = location.search.match(/[?&]c=([a-z-]+)/);
+    var r = regionBySlug(m ? m[1] : '') || REGIONS[0];
+    document.title = r.name + ' · En Voz (prototipo)';
+    var h1 = document.getElementById('region-title'); if (h1) h1.textContent = r.name;
+    var kick = document.getElementById('region-kicker'); if (kick) kick.textContent = r.group === 'Estados' ? 'Estados' : 'Alcaldías de la Ciudad de México';
+    root.innerHTML = regionChips(r.slug) + adSlot('region-superior-' + r.slug, '', r.name) + '<div id="region-lista"><p class="search-hint">Cargando notas…</p></div>';
+    byRegion(r.slug, 20).catch(function () { return []; }).then(function (arts) {
+      remember(arts);
+      if (!arts.length) { document.getElementById('region-lista').innerHTML = '<p class="notice">Todavía no hay notas de ' + esc(r.name) + '.</p>' + adSlot('region-inferior-' + r.slug, 'grande', r.name); return; }
+      var html = '<div class="block">' + bigCard(arts[0]) + arts.slice(1, 5).map(miniCard).join('') + '</div>';
+      html += adSlot('region-media-' + r.slug, '', r.name);
+      if (arts.length > 5) html += '<div class="rows">' + arts.slice(5).map(rowItem).join('') + '</div>';
+      html += adSlot('region-inferior-' + r.slug, 'grande', r.name);
+      document.getElementById('region-lista').innerHTML = html;
+    });
   }
 
   function renderHome(d) {
@@ -368,8 +459,10 @@
     var est = d['estados-cdmx'] || [];
     if (est.length) {
       html += '<section class="section mejora" data-mejora="Sin espacios vacíos" aria-labelledby="sec-estados">' + sectionHead('Estados / CDMX', 'sec-estados') +
+        regionChips('') +
         '<div class="list-block">' + bigCard(est[0]) + '<div class="rows">' + est.slice(1, 6).map(rowItem).join('') + '</div></div>' +
-        '<a class="see-all" href="' + categoryUrl('estados-cdmx') + '">Ver todas</a></section>';
+        '<a class="see-all" href="' + categoryUrl('estados-cdmx') + '">Ver todas</a></section>' +
+        adSlot('portada-estados', '', 'tu estado o alcaldía');
     }
 
     html += subscribeBand();
@@ -525,6 +618,8 @@
     loadData().then(function (d) {
       remember([].concat(d.highlighted || [], d.voces || [], d['agenda-publica'] || [], d['estados-cdmx'] || [], d.internacional || [], d.tendencias || [], d.negocios || [], d.deportes || []));
       renderHome(d);
+      renderEstados();
+      renderRegion();
       var sec = document.body.getAttribute('data-section');
       if (sec) { renderSectionPage(d, sec); bindCarousels(); }
     });

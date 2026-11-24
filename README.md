@@ -29,6 +29,14 @@ El botón **“Resaltar mejoras”** de la barra amarilla marca en rojo cada mej
 
 `redes.html` muestra cómo funcionaría en el panel de En Voz la generación automática de la imagen para Instagram de cada nota publicada (diseño de En Voz: foto, logotipo, sección y título) y su aprobación antes de publicarse. Permite editar el título de la imagen, el crédito de la foto y el texto, y aprobar o descartar. Es una maqueta: no publica nada.
 
+## Maqueta del back office: Mañanera en vivo
+
+`mananera.html` muestra cómo la IA ayudaría durante la conferencia matutina: cada 30 minutos agrupa lo dicho en temas y propone título, entrada, datos clave, frases textuales (con minuto para verificar), clip e imagen para redes. El editor asigna, crea el borrador o lo manda a redes. En la portada, la franja "Lo que va de la mañanera" muestra cómo se vería para el lector. Ejemplo con los temas de la mañanera del 24 de noviembre de 2026.
+
+## Estados y alcaldías
+
+`estados.html` y `region.html?c=morelos` (o cdmx, cuauhtemoc, benito-juarez, miguel-hidalgo, alvaro-obregon, cuajimalpa, estados, estado-de-mexico, oaxaca, zacatecas): notas por zona con espacios publicitarios pensados para negocios locales ("Anúnciate en Morelos").
+
 ## Cómo funciona
 
 - Sitio estático: HTML, CSS y JavaScript, sin instalación ni compilación.
