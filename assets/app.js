@@ -22,7 +22,7 @@
   // filtrando por tema las notas recientes de Tendencias, Agenda Pública e Internacional.
   var TOPICS = {
     negocios: /\b(econom\w*|empresa\w*|empresari\w*|inversi\w+|invers\w+|bolsa|peso mexicano|d[oó]lar\w*|banxico|inflaci\w+|exporta\w*|importa\w*|arancel\w*|t-mec|pemex|cfe|nvidia|mercado\w*|finanz\w*|financier\w*|emple\w+|pib|negocio\w*|comerci\w+|industria\w*|banco\w*|bbva|deuda|presupuesto|impuesto\w*|sat|ventas|tecnol[oó]gic\w*|startup\w*|d[eé]ficit|salario\w*|aguinaldo|buen fin|consumo|petr[oó]le\w*)\b/i,
-    deportes: /\b(f[uú]tbol|futbolista\w*|liga mx|nfl|nba|mlb|b[eé]isbol|tenis|boxeo|boxeador\w*|f[oó]rmula 1|f1|checo p[eé]rez|copa mundial|mundial femenil|mundial de f[uú]tbol|mundial 20\d\d|mundialista\w*|selecci[oó]n mexicana|el tri|ol[ií]mpic\w*|atleta\w*|deportes?|deportiv\w*|deportist\w*|estadio\w*|campeonato\w*|medalla\w*|nadador\w*|49ers|super bowl|chivas|cruz azul|pumas|tigres|rayados|fifa|concacaf|maratón|marat[oó]n|goles?|golazo|jugador\w*|entrenador\w*|t[eé]cnico nacional)\b/i
+    deportes: /\b(f[uú]tbol|futbolista\w*|liga mx|nfl|nba|mlb|b[eé]isbol|tenis|boxeo|boxeador\w*|f[oó]rmula 1|f1|checo p[eé]rez|copa mundial|mundial femenil|mundial de f[uú]tbol|mundial 20\d\d|mundialista\w*|selecci[oó]n mexicana|el tri|ol[ií]mpic\w*|atleta\w*|deportes?|deportiv\w*|deportist\w*|campeonato\w*|medalla\w*|nadador\w*|49ers|super bowl|chivas|cruz azul|pumas|tigres|rayados|fifa|concacaf|maratón|marat[oó]n|goles?|golazo|jugador\w*|entrenador\w*|t[eé]cnico nacional)\b/i
   };
   function byTopic(pool, topic, max) {
     var seen = {};
@@ -217,7 +217,7 @@
       latest('agenda-publica', 50).catch(function () { return []; }),
       latest('internacional', 30).catch(function () { return []; })
     ]).then(function (r) {
-      var pool = [].concat(r[8], r[9], r[10], r[5], r[2], r[4]);
+      var pool = [].concat(r[6], r[7], r[8], r[5], r[2], r[4]);
       return { live: true, highlighted: r[0], voces: r[1], 'agenda-publica': r[2], 'estados-cdmx': r[3], internacional: r[4], tendencias: r[5],
         negocios: byTopic(pool, 'negocios', 12), deportes: byTopic(pool, 'deportes', 12) };
     }).catch(function () {
