@@ -87,6 +87,21 @@
       '</div></div>';
   }
 
+  function topBar() {
+    var page = (location.pathname.split('/').pop() || 'index.html');
+    var fecha = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Mexico_City' }).format(new Date());
+    var links = [
+      { href: 'quienes-somos.html', name: 'Quiénes somos' },
+      { href: 'contacto.html', name: 'Contacto' },
+      { href: 'anunciate.html', name: 'Anúnciate' }
+    ].map(function (l) {
+      return '<a href="' + l.href + '"' + (page === l.href ? ' aria-current="page"' : '') + '>' + l.name + '</a>';
+    }).join('<span aria-hidden="true">·</span>');
+    return '<div class="top-bar mejora" data-mejora="Nuevo"><div class="container">' +
+      '<span class="top-date">' + esc(fecha.charAt(0).toUpperCase() + fecha.slice(1)) + '</span>' +
+      '<nav class="top-links" aria-label="El medio">' + links + '</nav></div></div>';
+  }
+
   function header(current) {
     var cats = CATEGORIES.map(function (c) {
       return '<li><a href="' + categoryUrl(c.slug) + '"' + (current === c.slug ? ' aria-current="page"' : '') + '>' + esc(c.name) + '</a></li>';
@@ -288,13 +303,24 @@
       '</div></section>';
   }
 
+  /* ---------------- Espacio publicitario ---------------- */
+  function adSlot(id) {
+    return '<aside class="ad-slot mejora" data-mejora="Nuevo: publicidad" id="ad-' + id + '" aria-label="Espacio publicitario">' +
+      '<span class="ad-label">Publicidad</span>' +
+      '<a class="ad-box" href="anunciate.html">' +
+        '<span class="ad-title">Espacio disponible para publicitar</span>' +
+        '<span class="ad-text">Tu marca aquí, frente a miles de lectores cada día.</span>' +
+        '<span class="ad-cta">Anúnciate con nosotros →</span>' +
+      '</a></aside>';
+  }
+
   function renderHome(d) {
     var root = document.getElementById('home');
     if (!root) return;
     ['highlighted', 'voces', 'agenda-publica', 'estados-cdmx', 'internacional', 'tendencias'].forEach(function (k) { remember(d[k]); });
 
     var h = d.highlighted || [];
-    var html = liveBox();
+    var html = liveBox() + adSlot('portada-superior');
     if (h.length) {
       html += '<section class="hero" aria-label="Lo más importante">' + heroMain(h[0]) +
         '<div class="hero-side">' + h.slice(1, 5).map(sideCard).join('') + '</div></section>';
@@ -396,7 +422,7 @@
   /* ---------------- Arranque ---------------- */
   function init() {
     var current = document.body.getAttribute('data-current') || '';
-    document.body.insertAdjacentHTML('afterbegin', protoBar() + header(current) + drawer() + searchPanel());
+    document.body.insertAdjacentHTML('afterbegin', protoBar() + topBar() + header(current) + drawer() + searchPanel());
     document.body.insertAdjacentHTML('beforeend', footer());
 
     var toggle = document.getElementById('toggle-mejoras');

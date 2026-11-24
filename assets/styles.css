@@ -305,3 +305,25 @@ body.show-mejoras .page-hero.mejora { outline-offset: -4px; }
 .live-off .countdown { font: 700 28px var(--font-head); color: var(--white); }
 .live-badge.replay { background: rgba(255,255,255,.16); }
 .live-badge.replay .dot { background: #FFD437; }
+
+/* ---------- Barra superior: Quiénes somos (nuevo) ---------- */
+.top-bar { background: var(--navy); color: #D6D8EA; font-family: var(--font-head); font-size: 13px; }
+.top-bar .container { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 36px; flex-wrap: wrap; }
+.top-date { text-transform: none; }
+.top-links { display: flex; align-items: center; gap: 10px; }
+.top-links span { color: #6B6E99; }
+.top-links a { color: var(--white); font-weight: 600; padding: 6px 2px; }
+.top-links a:first-child { color: var(--white); background: var(--red); padding: 4px 10px; border-radius: 4px; }
+.top-links a:hover { text-decoration: underline; }
+.top-links a[aria-current="page"] { text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 600px) { .top-date { display: none; } .top-bar .container { justify-content: center; } }
+
+/* ---------- Espacio publicitario (nuevo) ---------- */
+.ad-slot { margin: 14px 0 4px; }
+.ad-label { display: block; text-align: center; font: 600 11px var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: #8A8DA6; margin-bottom: 6px; }
+.ad-box { display: grid; justify-items: center; align-content: center; gap: 6px; max-width: 970px; min-height: 110px; margin: 0 auto; padding: 18px 20px; text-align: center; border: 2px dashed #B9BCCB; border-radius: 8px; background: repeating-linear-gradient(135deg, #F6F7FA 0 14px, #EEF1F6 14px 28px); transition: border-color .2s, background .2s; }
+.ad-box:hover { border-color: var(--red); }
+.ad-title { font: 700 22px var(--font-head); color: var(--navy); }
+.ad-text { font-size: 14px; color: var(--muted); }
+.ad-cta { font: 600 14px var(--font-head); color: var(--red); }
+@media (max-width: 600px) { .ad-title { font-size: 18px; } .ad-box { min-height: 100px; } }
