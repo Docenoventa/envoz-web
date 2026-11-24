@@ -244,7 +244,9 @@
     var day = t.getDay();               // 0 domingo … 6 sábado
     var mins = t.getHours() * 60 + t.getMinutes();
     var weekday = day >= 1 && day <= 5;
-    if (weekday && mins >= 6 * 60 && mins < 10 * 60 + 30) return 'live';
+    var START = 7 * 60 + 25, END = 10 * 60 + 30;
+    if (weekday && mins >= START && mins < END) return 'live';
+    if (weekday && mins >= 6 * 60 && mins < START) return 'soon:' + (7 * 60 + 30 - mins);
     var next;
     if (weekday && mins < 6 * 60) next = 'hoy a las 7:30 h';
     else if (day >= 1 && day <= 4) next = 'mañana a las 7:30 h';
@@ -254,14 +256,25 @@
   function liveBox() {
     var st = liveStatus();
     var isLive = st === 'live';
-    var player = isLive
-      ? '<div class="live-player"><iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel=' + LIVE_CHANNEL_ID + '&autoplay=1&mute=1" title="Mañanera en vivo" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'
-      : '<a class="live-player live-off" href="' + LIVE_URL + '" target="_blank" rel="noopener">' +
-          '<span class="live-off-inner"><span class="play">▶</span><span>La transmisión inicia ' + esc(st) + '</span></span></a>';
+    var isSoon = st.indexOf('soon:') === 0;
+    var player, badge;
+    if (isLive) {
+      player = '<div class="live-player"><iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel=' + LIVE_CHANNEL_ID + '&autoplay=1&mute=1" title="Mañanera en vivo" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+      badge = '<span class="live-badge on"><span class="dot"></span>EN VIVO</span>';
+    } else if (isSoon) {
+      var m = Number(st.slice(5));
+      var label = m >= 60 ? 'Comienza en ' + Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : 'Comienza en ' + m + ' min';
+      player = '<a class="live-player live-off" href="' + LIVE_URL + '" target="_blank" rel="noopener">' +
+        '<span class="live-off-inner"><span class="play">▶</span><span class="countdown">' + label + '</span><span>Hoy a las 7:30 h desde Palacio Nacional</span></span></a>';
+      badge = '<span class="live-badge soon"><span class="dot"></span>HOY · 7:30 H</span>';
+    } else {
+      player = '<a class="live-player live-off" href="' + LIVE_URL + '" target="_blank" rel="noopener">' +
+        '<span class="live-off-inner"><span class="play">▶</span><span>La transmisión inicia ' + esc(st) + '</span></span></a>';
+      badge = '<span class="live-badge"><span class="dot"></span>PRÓXIMA TRANSMISIÓN</span>';
+    }
     return '<section class="live-box mejora" data-mejora="Nuevo: mañanera en vivo" aria-labelledby="live-title">' +
       player +
-      '<div class="live-info">' +
-        '<span class="live-badge' + (isLive ? ' on' : '') + '"><span class="dot"></span>' + (isLive ? 'EN VIVO · HOY' : 'PRÓXIMA TRANSMISIÓN') + '</span>' +
+      '<div class="live-info">' + badge +
         '<h2 id="live-title"><a href="' + LIVE_URL + '" target="_blank" rel="noopener">La Mañanera del Pueblo</a></h2>' +
         '<p>Conferencia de prensa matutina de la presidenta Claudia Sheinbaum desde Palacio Nacional. De lunes a viernes, a partir de las 7:30 h (hora del centro de México).</p>' +
         '<a class="btn btn-red" href="' + LIVE_URL + '" target="_blank" rel="noopener">Ver en vivo en YouTube</a>' +

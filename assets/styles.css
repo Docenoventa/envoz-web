@@ -300,3 +300,6 @@ body.show-mejoras .page-hero.mejora { outline-offset: -4px; }
 .live-source { font-size: 12px; color: #9A9CC0; }
 @media (prefers-reduced-motion: reduce) { .live-badge.on .dot { animation: none; } }
 @media (max-width: 900px) { .live-box { grid-template-columns: minmax(0, 1fr); } .live-info { padding: 0 4px 4px; } }
+.live-badge.soon { background: #FFD437; color: var(--navy); }
+.live-badge.soon .dot { background: var(--red); }
+.live-off .countdown { font: 700 28px var(--font-head); color: var(--white); }
