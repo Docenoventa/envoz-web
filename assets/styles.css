@@ -327,3 +327,8 @@ body.show-mejoras .page-hero.mejora { outline-offset: -4px; }
 .ad-text { font-size: 14px; color: var(--muted); }
 .ad-cta { font: 600 14px var(--font-head); color: var(--red); }
 @media (max-width: 600px) { .ad-title { font-size: 18px; } .ad-box { min-height: 100px; } }
+.ad-slot { margin-bottom: 28px; }
+.ad-size { font-size: 12px; color: #8A8DA6; }
+.ad-grande .ad-box { min-height: 250px; }
+.ad-grande .ad-title { font-size: 28px; }
+@media (max-width: 600px) { .ad-grande .ad-box { min-height: 250px; max-width: 300px; } .ad-grande .ad-title { font-size: 22px; } }

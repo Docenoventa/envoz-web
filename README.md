@@ -15,7 +15,7 @@ Sirve para que el equipo y los desarrolladores vean cómo debe quedar el sitio. 
 | **Menú lateral** con secciones y páginas del medio | Botón ☰ |
 | Recuadro de **la Mañanera en vivo** (canal oficial @ClaudiaSheinbaumP): reproduce la transmisión de lunes a viernes desde las 6:00 h con cuenta regresiva y de 7:25 a 10:30 h con el video en vivo y de 10:30 a 23:00 h con la repetición y, fuera de ese horario, muestra la próxima | Inicio de la portada |
 | **Barra superior** con fecha y acceso a Quiénes somos, Contacto y Anúnciate, arriba de las secciones | Todas las páginas |
-| **Espacio publicitario** “Disponible para publicitar” debajo de la mañanera, enlazado a Anúnciate | Portada |
+| Tres **espacios publicitarios** “Disponible para publicitar” (debajo de la mañanera, entre Agenda Pública y Estados / CDMX, y uno grande antes de Tendencias), enlazados a Anúnciate | Portada |
 | Franja de **suscripción** a la edición diaria (WhatsApp, Telegram, correo) | Portada |
 | Sección **Estados / CDMX** sin espacios vacíos | Portada |
 | **Tendencias** con carrusel completo | Portada |

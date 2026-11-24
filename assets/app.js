@@ -304,13 +304,14 @@
   }
 
   /* ---------------- Espacio publicitario ---------------- */
-  function adSlot(id) {
-    return '<aside class="ad-slot mejora" data-mejora="Nuevo: publicidad" id="ad-' + id + '" aria-label="Espacio publicitario">' +
+  function adSlot(id, size) {
+    return '<aside class="ad-slot' + (size ? ' ad-' + size : '') + ' mejora" data-mejora="Nuevo: publicidad" id="ad-' + id + '" aria-label="Espacio publicitario">' +
       '<span class="ad-label">Publicidad</span>' +
       '<a class="ad-box" href="anunciate.html">' +
         '<span class="ad-title">Espacio disponible para publicitar</span>' +
         '<span class="ad-text">Tu marca aquí, frente a miles de lectores cada día.</span>' +
         '<span class="ad-cta">Anúnciate con nosotros →</span>' +
+        (size === 'grande' ? '<span class="ad-size">Formato grande · 970 × 250</span>' : '<span class="ad-size">Banner · 970 × 90</span>') +
       '</a></aside>';
   }
 
@@ -330,6 +331,7 @@
         '<div class="carousel" data-carousel="sec-voces">' + d.voces.map(carouselCard).join('') + '</div></section>';
     }
     html += blockSection('Agenda pública', 'sec-agenda', 'agenda-publica', d['agenda-publica']);
+    html += adSlot('portada-media');
 
     var est = d['estados-cdmx'] || [];
     if (est.length) {
@@ -340,6 +342,7 @@
 
     html += subscribeBand();
     html += blockSection('Internacional', 'sec-internacional', 'internacional', d.internacional);
+    html += adSlot('portada-inferior', 'grande');
 
     var tr = d.tendencias || [];
     if (tr.length) {
