@@ -244,9 +244,9 @@
     var day = t.getDay();               // 0 domingo … 6 sábado
     var mins = t.getHours() * 60 + t.getMinutes();
     var weekday = day >= 1 && day <= 5;
-    if (weekday && mins >= 7 * 60 + 15 && mins < 10 * 60 + 30) return 'live';
+    if (weekday && mins >= 6 * 60 && mins < 10 * 60 + 30) return 'live';
     var next;
-    if (weekday && mins < 7 * 60 + 15) next = 'hoy a las 7:30 h';
+    if (weekday && mins < 6 * 60) next = 'hoy a las 7:30 h';
     else if (day >= 1 && day <= 4) next = 'mañana a las 7:30 h';
     else next = 'el lunes a las 7:30 h';
     return next;
@@ -261,7 +261,7 @@
     return '<section class="live-box mejora" data-mejora="Nuevo: mañanera en vivo" aria-labelledby="live-title">' +
       player +
       '<div class="live-info">' +
-        '<span class="live-badge' + (isLive ? ' on' : '') + '"><span class="dot"></span>' + (isLive ? 'EN VIVO' : 'PRÓXIMA TRANSMISIÓN') + '</span>' +
+        '<span class="live-badge' + (isLive ? ' on' : '') + '"><span class="dot"></span>' + (isLive ? 'EN VIVO · HOY' : 'PRÓXIMA TRANSMISIÓN') + '</span>' +
         '<h2 id="live-title"><a href="' + LIVE_URL + '" target="_blank" rel="noopener">La Mañanera del Pueblo</a></h2>' +
         '<p>Conferencia de prensa matutina de la presidenta Claudia Sheinbaum desde Palacio Nacional. De lunes a viernes, a partir de las 7:30 h (hora del centro de México).</p>' +
         '<a class="btn btn-red" href="' + LIVE_URL + '" target="_blank" rel="noopener">Ver en vivo en YouTube</a>' +
