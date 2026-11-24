@@ -248,3 +248,9 @@ body.show-mejoras .mejora::after {
   .cat-nav li { flex: none; }
   .cat-nav li + li::before { display: none; }
 }
+
+/* Ajustes de posición de las etiquetas de mejora */
+body.show-mejoras #open-menu.mejora::after { left: 0; right: auto; top: -10px; }
+body.show-mejoras #open-search.mejora::after { right: 0; top: -10px; }
+body.show-mejoras .page-hero.mejora::after { top: 14px; right: 24px; }
+body.show-mejoras .page-hero.mejora { outline-offset: -4px; }
