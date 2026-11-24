@@ -332,3 +332,5 @@ body.show-mejoras .page-hero.mejora { outline-offset: -4px; }
 .ad-grande .ad-box { min-height: 250px; }
 .ad-grande .ad-title { font-size: 28px; }
 @media (max-width: 600px) { .ad-grande .ad-box { min-height: 250px; max-width: 300px; } .ad-grande .ad-title { font-size: 22px; } }
+.cat-nav .nav-about a { color: var(--red); font-weight: 700; }
+.cat-nav .nav-about a:hover, .cat-nav .nav-about a[aria-current="page"] { color: var(--navy); }

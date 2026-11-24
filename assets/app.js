@@ -106,6 +106,8 @@
     var cats = CATEGORIES.map(function (c) {
       return '<li><a href="' + categoryUrl(c.slug) + '"' + (current === c.slug ? ' aria-current="page"' : '') + '>' + esc(c.name) + '</a></li>';
     }).join('');
+    var onAbout = /quienes-somos\.html$/.test(location.pathname);
+    cats = '<li class="nav-about mejora" data-mejora="Nuevo"><a href="quienes-somos.html"' + (onAbout ? ' aria-current="page"' : '') + '>Quiénes somos</a></li>' + cats;
     return '<header class="site-header">' +
       '<div class="container header-top">' +
         '<button class="icon-btn mejora" data-mejora="Menú completo" type="button" id="open-menu" aria-label="Abrir menú">' + ICONS.menu + '</button>' +
