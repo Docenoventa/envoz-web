@@ -29,8 +29,10 @@
     return (pool || []).filter(function (a) {
       if (!a || seen[a.slug]) return false;
       seen[a.slug] = true;
-      return TOPICS[topic].test(a.title + ' ' + (a.excerpt || ''));
-    }).slice(0, max || 12);
+      var text = a.title + ' ' + (a.excerpt || '');
+      if (topic === 'deportes' && /prisi[oó]n|asesin\w*|homicid\w*|sentencia\w*|detenid\w*|ayotzinapa/i.test(text)) return false;
+      return TOPICS[topic].test(text);
+    }).sort(function (x, y) { return String(y.publishAt).localeCompare(String(x.publishAt)); }).slice(0, max || 12);
   }
   var CATEGORY_IDS = {
     'agenda-publica': '17918dd6-dd4a-4a03-a646-7c5c723cbdf6',
