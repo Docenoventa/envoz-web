@@ -196,9 +196,9 @@
       excerpt: (a.plainBody || '').replace(/^[^.]*?\d{4}\.\s?-\s?/, '').slice(0, 200)
     };
   }
-  function getJSON(path) {
+  function getJSON(path, ms) {
     var ctrl = window.AbortController ? new AbortController() : null;
-    var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, 6000);
+    var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, ms || 8000);
     return fetch(API + path, ctrl ? { signal: ctrl.signal } : {}).then(function (r) {
       clearTimeout(t);
       if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -206,7 +206,7 @@
     }).then(function (j) { return (j.data && j.data.articles || []).map(slim); });
   }
   function latest(slug, n) {
-    return getJSON('latest-articles?categoryId=' + CATEGORY_IDS[slug] + '&pagination%5Bpage%5D=1&pagination%5BrowsPerPage%5D=' + n);
+    return getJSON('latest-articles?categoryId=' + CATEGORY_IDS[slug] + '&pagination%5Bpage%5D=1&pagination%5BrowsPerPage%5D=' + n, n > 10 ? 20000 : 8000);
   }
   function loadData() {
     return Promise.all([
