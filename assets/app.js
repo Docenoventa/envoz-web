@@ -5,6 +5,9 @@
   'use strict';
 
   var SITE = 'https://envoz.mx';
+  var LIVE_CHANNEL_ID = 'UC6mvc52_1j0okpAaXJj2c_Q'; // Canal oficial de Claudia Sheinbaum Pardo en YouTube
+  var LIVE_URL = 'https://www.youtube.com/@ClaudiaSheinbaumP/live';
+  var LIVE_CHANNEL_URL = 'https://www.youtube.com/@ClaudiaSheinbaumP/streams';
   var API = 'https://prod.api.envoz.mx/envoz-public/article/';
   var CATEGORIES = [
     { slug: 'entre-voces', name: 'Entre Voces' },
@@ -230,13 +233,49 @@
     });
   }
 
+  /* ---------------- Mañanera en vivo ---------------- */
+  // Hora del centro de México (UTC-6, sin horario de verano desde 2023)
+  function mexicoNow() {
+    var now = new Date();
+    return new Date(now.getTime() + now.getTimezoneOffset() * 60000 - 6 * 3600000);
+  }
+  function liveStatus() {
+    var t = mexicoNow();
+    var day = t.getDay();               // 0 domingo … 6 sábado
+    var mins = t.getHours() * 60 + t.getMinutes();
+    var weekday = day >= 1 && day <= 5;
+    if (weekday && mins >= 7 * 60 + 15 && mins < 10 * 60 + 30) return 'live';
+    var next;
+    if (weekday && mins < 7 * 60 + 15) next = 'hoy a las 7:30 h';
+    else if (day >= 1 && day <= 4) next = 'mañana a las 7:30 h';
+    else next = 'el lunes a las 7:30 h';
+    return next;
+  }
+  function liveBox() {
+    var st = liveStatus();
+    var isLive = st === 'live';
+    var player = isLive
+      ? '<div class="live-player"><iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel=' + LIVE_CHANNEL_ID + '&autoplay=1&mute=1" title="Mañanera en vivo" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'
+      : '<a class="live-player live-off" href="' + LIVE_URL + '" target="_blank" rel="noopener">' +
+          '<span class="live-off-inner"><span class="play">▶</span><span>La transmisión inicia ' + esc(st) + '</span></span></a>';
+    return '<section class="live-box mejora" data-mejora="Nuevo: mañanera en vivo" aria-labelledby="live-title">' +
+      player +
+      '<div class="live-info">' +
+        '<span class="live-badge' + (isLive ? ' on' : '') + '"><span class="dot"></span>' + (isLive ? 'EN VIVO' : 'PRÓXIMA TRANSMISIÓN') + '</span>' +
+        '<h2 id="live-title"><a href="' + LIVE_URL + '" target="_blank" rel="noopener">La Mañanera del Pueblo</a></h2>' +
+        '<p>Conferencia de prensa matutina de la presidenta Claudia Sheinbaum desde Palacio Nacional. De lunes a viernes, a partir de las 7:30 h (hora del centro de México).</p>' +
+        '<a class="btn btn-red" href="' + LIVE_URL + '" target="_blank" rel="noopener">Ver en vivo en YouTube</a>' +
+        '<span class="live-source">Transmisión del canal oficial @ClaudiaSheinbaumP</span>' +
+      '</div></section>';
+  }
+
   function renderHome(d) {
     var root = document.getElementById('home');
     if (!root) return;
     ['highlighted', 'voces', 'agenda-publica', 'estados-cdmx', 'internacional', 'tendencias'].forEach(function (k) { remember(d[k]); });
 
     var h = d.highlighted || [];
-    var html = '';
+    var html = liveBox();
     if (h.length) {
       html += '<section class="hero" aria-label="Lo más importante">' + heroMain(h[0]) +
         '<div class="hero-side">' + h.slice(1, 5).map(sideCard).join('') + '</div></section>';
@@ -268,6 +307,16 @@
     }
     root.innerHTML = html;
     bindCarousels();
+    // Revisa cada minuto si ya empezó (o terminó) la transmisión y actualiza el recuadro
+    var lastStatus = liveStatus();
+    setInterval(function () {
+      var now = liveStatus();
+      if (now !== lastStatus) {
+        lastStatus = now;
+        var box = document.querySelector('.live-box');
+        if (box) box.outerHTML = liveBox();
+      }
+    }, 60000);
   }
 
   function blockSection(title, id, slug, list) {
