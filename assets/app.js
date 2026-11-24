@@ -14,8 +14,24 @@
     { slug: 'agenda-publica', name: 'Agenda Pública' },
     { slug: 'estados-cdmx', name: 'Estados / CDMX' },
     { slug: 'internacional', name: 'Internacional' },
-    { slug: 'tendencias', name: 'Tendencias' }
+    { slug: 'tendencias', name: 'Tendencias' },
+    { slug: 'negocios', name: 'Negocios', local: 'negocios.html', isNew: true },
+    { slug: 'deportes', name: 'Deportes', local: 'deportes.html', isNew: true }
   ];
+  // Secciones nuevas: En Voz aún no tiene estas categorías. El prototipo las arma
+  // filtrando por tema las notas recientes de Tendencias, Agenda Pública e Internacional.
+  var TOPICS = {
+    negocios: /\b(econom\w*|empresa\w*|empresari\w*|inversi\w+|invers\w+|bolsa|peso mexicano|d[oó]lar\w*|banxico|inflaci\w+|exporta\w*|importa\w*|arancel\w*|t-mec|pemex|cfe|nvidia|mercado\w*|finanz\w*|financier\w*|emple\w+|pib|negocio\w*|comerci\w+|industria\w*|banco\w*|bbva|deuda|presupuesto|impuesto\w*|sat|ventas|tecnol[oó]gic\w*|startup\w*|d[eé]ficit|salario\w*|aguinaldo|buen fin|consumo|petr[oó]le\w*)\b/i,
+    deportes: /\b(f[uú]tbol|futbolista\w*|liga mx|nfl|nba|mlb|b[eé]isbol|tenis|boxeo|boxeador\w*|f[oó]rmula 1|f1|checo p[eé]rez|copa mundial|mundial femenil|mundial de f[uú]tbol|mundial 20\d\d|mundialista\w*|selecci[oó]n mexicana|el tri|ol[ií]mpic\w*|atleta\w*|deportes?|deportiv\w*|deportist\w*|estadio\w*|campeonato\w*|medalla\w*|nadador\w*|49ers|super bowl|chivas|cruz azul|pumas|tigres|rayados|fifa|concacaf|maratón|marat[oó]n|goles?|golazo|jugador\w*|entrenador\w*|t[eé]cnico nacional)\b/i
+  };
+  function byTopic(pool, topic, max) {
+    var seen = {};
+    return (pool || []).filter(function (a) {
+      if (!a || seen[a.slug]) return false;
+      seen[a.slug] = true;
+      return TOPICS[topic].test(a.title + ' ' + (a.excerpt || ''));
+    }).slice(0, max || 12);
+  }
   var CATEGORY_IDS = {
     'agenda-publica': '17918dd6-dd4a-4a03-a646-7c5c723cbdf6',
     'estados-cdmx': 'c66af518-0f1f-4c73-aad3-455e8d04d001',
@@ -61,7 +77,10 @@
     });
   }
   function articleUrl(a) { return SITE + '/articulo/' + a.cat + '/' + a.slug; }
-  function categoryUrl(slug) { return SITE + '/categoria/' + slug; }
+  function categoryUrl(slug) {
+    for (var i = 0; i < CATEGORIES.length; i++) if (CATEGORIES[i].slug === slug && CATEGORIES[i].local) return CATEGORIES[i].local;
+    return SITE + '/categoria/' + slug;
+  }
 
   function timeAgo(iso) {
     var diff = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -104,7 +123,7 @@
 
   function header(current) {
     var cats = CATEGORIES.map(function (c) {
-      return '<li><a href="' + categoryUrl(c.slug) + '"' + (current === c.slug ? ' aria-current="page"' : '') + '>' + esc(c.name) + '</a></li>';
+      return '<li' + (c.isNew ? ' class="mejora" data-mejora="Nueva"' : '') + '><a href="' + categoryUrl(c.slug) + '"' + (current === c.slug ? ' aria-current="page"' : '') + '>' + esc(c.name) + '</a></li>';
     }).join('');
     var onAbout = /quienes-somos\.html$/.test(location.pathname);
     cats = '<li class="nav-about mejora" data-mejora="Nuevo"><a href="quienes-somos.html"' + (onAbout ? ' aria-current="page"' : '') + '>Quiénes somos</a></li>' + cats;
@@ -193,11 +212,19 @@
     return Promise.all([
       getJSON('get-highlighted-articles'),
       getJSON('get-between-voices-articles?pagination%5Bpage%5D=1&pagination%5BrowsPerPage%5D=6'),
-      latest('agenda-publica', 7), latest('estados-cdmx', 7), latest('internacional', 7), latest('tendencias', 7)
+      latest('agenda-publica', 7), latest('estados-cdmx', 7), latest('internacional', 7), latest('tendencias', 7),
+      latest('tendencias', 50).catch(function () { return []; }),
+      latest('agenda-publica', 50).catch(function () { return []; }),
+      latest('internacional', 30).catch(function () { return []; })
     ]).then(function (r) {
-      return { live: true, highlighted: r[0], voces: r[1], 'agenda-publica': r[2], 'estados-cdmx': r[3], internacional: r[4], tendencias: r[5] };
+      var pool = [].concat(r[8], r[9], r[10], r[5], r[2], r[4]);
+      return { live: true, highlighted: r[0], voces: r[1], 'agenda-publica': r[2], 'estados-cdmx': r[3], internacional: r[4], tendencias: r[5],
+        negocios: byTopic(pool, 'negocios', 12), deportes: byTopic(pool, 'deportes', 12) };
     }).catch(function () {
       var s = window.ENVOZ_SNAPSHOT || {};
+      var pool = [].concat(s.tendencias || [], s['agenda-publica'] || [], s.internacional || []);
+      s.negocios = byTopic(pool, 'negocios', 12);
+      s.deportes = byTopic(pool, 'deportes', 12);
       s.live = false;
       return s;
     });
@@ -334,6 +361,7 @@
     }
     html += blockSection('Agenda pública', 'sec-agenda', 'agenda-publica', d['agenda-publica']);
     html += adSlot('portada-media');
+    html += newSection('Negocios', 'sec-negocios', 'negocios', d.negocios, 'block');
 
     var est = d['estados-cdmx'] || [];
     if (est.length) {
@@ -345,6 +373,8 @@
     html += subscribeBand();
     html += blockSection('Internacional', 'sec-internacional', 'internacional', d.internacional);
     html += adSlot('portada-inferior', 'grande');
+
+    html += newSection('Deportes', 'sec-deportes', 'deportes', d.deportes, 'carousel');
 
     var tr = d.tendencias || [];
     if (tr.length) {
@@ -367,6 +397,35 @@
         if (box) box.outerHTML = liveBox();
       }
     }, 60000);
+  }
+
+  function newNote(slug) {
+    return '<p class="new-note">Sección nueva: en el prototipo se arma con notas recientes sobre ' + (slug === 'deportes' ? 'deportes' : 'economía y negocios') + '. En envoz.mx falta crear la categoría.</p>';
+  }
+  function newSection(title, id, slug, list, layout) {
+    list = list || [];
+    if (!list.length) return '';
+    var body;
+    if (layout === 'carousel' || list.length < 5) {
+      body = '<div class="carousel" data-carousel="' + id + '">' + list.map(carouselCard).join('') + '</div>';
+    } else {
+      body = '<div class="block">' + bigCard(list[0]) + list.slice(1, 5).map(miniCard).join('') + '</div>';
+    }
+    return '<section class="section mejora" data-mejora="Nueva sección" aria-labelledby="' + id + '">' +
+      sectionHead(title, id, layout === 'carousel' || list.length < 5) + newNote(slug) + body +
+      '<a class="see-all" href="' + slug + '.html">Ver todas</a></section>';
+  }
+
+  /* ---------------- Página de sección nueva (negocios.html, deportes.html) ---------------- */
+  function renderSectionPage(d, slug) {
+    var root = document.getElementById('section-page');
+    if (!root) return;
+    var list = d[slug] || [];
+    if (!list.length) { root.innerHTML = '<p class="notice">Todavía no hay notas recientes de este tema.</p>'; return; }
+    root.innerHTML = newNote(slug) +
+      '<div class="block">' + bigCard(list[0]) + list.slice(1, 5).map(miniCard).join('') + '</div>' +
+      (list.length > 5 ? '<div class="rows" style="margin-top:24px">' + list.slice(5).map(rowItem).join('') + '</div>' : '') +
+      adSlot('seccion-' + slug);
   }
 
   function blockSection(title, id, slug, list) {
@@ -462,8 +521,10 @@
     top.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
     loadData().then(function (d) {
-      remember([].concat(d.highlighted || [], d.voces || [], d['agenda-publica'] || [], d['estados-cdmx'] || [], d.internacional || [], d.tendencias || []));
+      remember([].concat(d.highlighted || [], d.voces || [], d['agenda-publica'] || [], d['estados-cdmx'] || [], d.internacional || [], d.tendencias || [], d.negocios || [], d.deportes || []));
       renderHome(d);
+      var sec = document.body.getAttribute('data-section');
+      if (sec) { renderSectionPage(d, sec); bindCarousels(); }
     });
   }
 

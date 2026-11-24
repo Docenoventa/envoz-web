@@ -334,3 +334,8 @@ body.show-mejoras .page-hero.mejora { outline-offset: -4px; }
 @media (max-width: 600px) { .ad-grande .ad-box { min-height: 250px; max-width: 300px; } .ad-grande .ad-title { font-size: 22px; } }
 .cat-nav .nav-about a { color: var(--red); font-weight: 700; }
 .cat-nav .nav-about a:hover, .cat-nav .nav-about a[aria-current="page"] { color: var(--navy); }
+
+/* ---------- Secciones nuevas: Negocios y Deportes ---------- */
+.new-note { margin: -4px 0 14px; font-size: 13px; color: var(--muted); background: #FFF4D6; border-radius: 4px; padding: 6px 10px; width: max-content; max-width: 100%; }
+body.show-mejoras .cat-nav li.mejora { outline-offset: -2px; }
+body.show-mejoras .cat-nav li.mejora::after { top: -6px; right: 4px; font-size: 9px; padding: 2px 6px; }
