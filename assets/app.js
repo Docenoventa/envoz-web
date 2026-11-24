@@ -244,7 +244,7 @@
     var day = t.getDay();               // 0 domingo … 6 sábado
     var mins = t.getHours() * 60 + t.getMinutes();
     var weekday = day >= 1 && day <= 5;
-    var START = 7 * 60 + 25, END = 10 * 60 + 30;
+    var START = 7 * 60 + 25, END = 23 * 60;
     if (weekday && mins >= START && mins < END) return 'live';
     if (weekday && mins >= 6 * 60 && mins < START) return 'soon:' + (7 * 60 + 30 - mins);
     var next;

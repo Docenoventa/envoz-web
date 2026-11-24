@@ -13,7 +13,7 @@ Sirve para que el equipo y los desarrolladores vean cómo debe quedar el sitio. 
 | **Aviso de privacidad** (estructura; el texto final debe revisarlo un abogado) | `aviso-de-privacidad.html` |
 | **Buscador** de notas (lupa del encabezado) | Todas las páginas |
 | **Menú lateral** con secciones y páginas del medio | Botón ☰ |
-| Recuadro de **la Mañanera en vivo** (canal oficial @ClaudiaSheinbaumP): reproduce la transmisión de lunes a viernes desde las 6:00 h con cuenta regresiva y de 7:25 a 10:30 h con el video en vivo y, fuera de ese horario, muestra la próxima | Inicio de la portada |
+| Recuadro de **la Mañanera en vivo** (canal oficial @ClaudiaSheinbaumP): reproduce la transmisión de lunes a viernes desde las 6:00 h con cuenta regresiva y de 7:25 a 23:00 h con el video y, fuera de ese horario, muestra la próxima | Inicio de la portada |
 | Franja de **suscripción** a la edición diaria (WhatsApp, Telegram, correo) | Portada |
 | Sección **Estados / CDMX** sin espacios vacíos | Portada |
 | **Tendencias** con carrusel completo | Portada |
