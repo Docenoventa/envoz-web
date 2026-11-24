@@ -7,6 +7,26 @@
   var IDS = ['17918dd6-dd4a-4a03-a646-7c5c723cbdf6', 'c66af518-0f1f-4c73-aad3-455e8d04d001', 'e977b5bc-ec56-4bf3-ae9b-1e1f38263e8d', '4323708e-d9c1-4a40-8f3c-be5f9427fcb4'];
   var NAMES = { 'agenda-publica': 'Agenda Pública', 'estados-cdmx': 'Estados / CDMX', 'internacional': 'Internacional', 'tendencias': 'Tendencias', 'entre-voces': 'Entre Voces' };
   var TAGS = { 'agenda-publica': '#AgendaPública', 'estados-cdmx': '#CDMX', 'internacional': '#Internacional', 'tendencias': '#Tendencias', 'entre-voces': '#EntreVoces' };
+  // Redes disponibles. mode: auto = se publica sola al aprobar; manual = el panel prepara texto e imagen para compartir a mano
+  var NETWORKS = [
+    { id: 'instagram', name: 'Instagram', mode: 'auto', note: 'Automática' },
+    { id: 'facebook', name: 'Facebook', mode: 'auto', note: 'Automática' },
+    { id: 'threads', name: 'Threads', mode: 'auto', note: 'Automática' },
+    { id: 'x', name: 'X', mode: 'auto', note: 'Automática · con costo por publicación' },
+    { id: 'tiktok', name: 'TikTok', mode: 'auto', note: 'Automática tras aprobación de TikTok' },
+    { id: 'telegram', name: 'Telegram', mode: 'auto', note: 'Automática' },
+    { id: 'whatsapp', name: 'Canal de WhatsApp', mode: 'manual', note: 'Manual: copiar y compartir' }
+  ];
+  var DEFAULT_NETS = ['instagram', 'facebook', 'threads'];
+  function netName(id) { for (var i = 0; i < NETWORKS.length; i++) if (NETWORKS[i].id === id) return NETWORKS[i].name; return id; }
+  function netsPicker(p) {
+    return '<fieldset class="bo-nets"><legend>Publicar en</legend>' + NETWORKS.map(function (n) {
+      var on = p.nets.indexOf(n.id) !== -1;
+      return '<label class="bo-net' + (n.mode === 'manual' ? ' manual' : '') + '"><input type="checkbox" data-net="' + n.id + '" data-id="' + esc(p.id) + '"' + (on ? ' checked' : '') + '>' +
+        '<span><b>' + esc(n.name) + '</b><small>' + esc(n.note) + '</small></span></label>';
+    }).join('') + '</fieldset>' +
+    (p.nets.indexOf('x') !== -1 && p.caption.length > 280 ? '<p class="bo-warn">Para X se enviará una versión corta: título y enlace (máximo 280 caracteres).</p>' : '');
+  }
   var posts = [];
   var filter = 'pendiente';
 
@@ -91,8 +111,9 @@
       (p.status === 'pendiente'
         ? '<label>Título para la imagen<input data-field="imgTitle" data-id="' + esc(p.id) + '" value="' + esc(p.imgTitle || p.title) + '"></label>' +
           '<label>Crédito de la foto<input data-field="credit" data-id="' + esc(p.id) + '" value="' + esc(p.credit || 'Especial') + '"></label>' +
-          '<label>Texto de la publicación<textarea data-field="caption" data-id="' + esc(p.id) + '">' + esc(p.caption) + '</textarea></label>'
-        : '') +
+          '<label>Texto de la publicación<textarea data-field="caption" data-id="' + esc(p.id) + '">' + esc(p.caption) + '</textarea></label>' +
+          '<div class="nets-wrap">' + netsPicker(p) + '</div>'
+        : '<p class="bo-sent">' + (p.status === 'aprobada' ? 'Enviada a: ' + p.sentTo.map(netName).join(', ') : 'No se publicará en redes.') + '</p>') +
       '<div class="bo-actions">' + actions + '</div></article>';
   }
 
@@ -101,7 +122,7 @@
     posts.forEach(function (p) { c[p.status]++; });
     Object.keys(c).forEach(function (k) { document.getElementById('c-' + k).textContent = c[k]; });
     document.getElementById('side-count').textContent = c.pendiente;
-    document.getElementById('quota').textContent = c.aprobada;
+    document.getElementById('quota').textContent = posts.filter(function (x) { return x.status === 'aprobada' && x.sentTo.indexOf('instagram') !== -1; }).length;
   }
 
   // Escala la publicación de 1080 × 1350 al ancho de su tarjeta
@@ -139,9 +160,12 @@
     if (!p) return;
     var act = btn.getAttribute('data-act');
     if (act === 'aprobar') {
-      if (posts.filter(function (x) { return x.status === 'aprobada'; }).length >= 50) { toast('Se alcanzó el límite de 50 publicaciones de Instagram en 24 horas.'); return; }
+      if (!p.nets.length) { toast('Elige al menos una red social antes de aprobar.'); return; }
+      if (p.nets.indexOf('instagram') !== -1 && posts.filter(function (x) { return x.status === 'aprobada' && x.sentTo.indexOf('instagram') !== -1; }).length >= 50) { toast('Se alcanzó el límite de 50 publicaciones de Instagram en 24 horas.'); return; }
       p.status = 'aprobada';
-      toast('Aprobada. En el sistema real se publicaría ahora en Instagram @envozmxoficial.');
+      p.sentTo = p.nets.slice();
+      var autos = p.sentTo.filter(function (id) { return id !== 'whatsapp'; }).map(netName);
+      toast('Aprobada. En el sistema real se publicaría ahora en: ' + (autos.join(', ') || 'ninguna red automática') + (p.sentTo.indexOf('whatsapp') !== -1 ? '. Para el canal de WhatsApp se copiaría el texto y se descargaría la imagen.' : '.'));
     } else if (act === 'descartar') {
       p.status = 'descartada';
       toast('Descartada. No se publicará en Instagram.');
@@ -149,6 +173,17 @@
       p.status = 'pendiente';
     }
     render();
+  });
+
+  document.addEventListener('change', function (e) {
+    var cb = e.target.closest('[data-net]');
+    if (!cb) return;
+    var p = find(cb.getAttribute('data-id'));
+    if (!p) return;
+    var id = cb.getAttribute('data-net');
+    p.nets = p.nets.filter(function (n) { return n !== id; });
+    if (cb.checked) p.nets.push(id);
+    cb.closest('.nets-wrap').innerHTML = netsPicker(p);
   });
 
   document.addEventListener('input', function (e) {
@@ -171,7 +206,7 @@
       if (!a || !a.slug || seen[a.slug] || !a.img) return false;
       seen[a.slug] = true; return true;
     }).sort(function (a, b) { return String(b.publishAt).localeCompare(String(a.publishAt)); }).slice(0, 12)
-      .map(function (a) { a.status = 'pendiente'; a.caption = caption(a); return a; });
+      .map(function (a) { a.status = 'pendiente'; a.caption = caption(a); a.nets = DEFAULT_NETS.slice(); a.sentTo = []; return a; });
     render();
   });
 })();
