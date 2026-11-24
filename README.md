@@ -25,6 +25,10 @@ Sirve para que el equipo y los desarrolladores vean cómo debe quedar el sitio. 
 
 El botón **“Resaltar mejoras”** de la barra amarilla marca en rojo cada mejora (también con `?mejoras=1` en la dirección).
 
+## Maqueta del back office: Redes por aprobar
+
+`redes.html` muestra cómo funcionaría en el panel de En Voz la generación automática de la imagen para Instagram de cada nota publicada (diseño de En Voz: foto, logotipo, sección y título) y su aprobación antes de publicarse. Permite editar el título de la imagen, el crédito de la foto y el texto, y aprobar o descartar. Es una maqueta: no publica nada.
+
 ## Cómo funciona
 
 - Sitio estático: HTML, CSS y JavaScript, sin instalación ni compilación.

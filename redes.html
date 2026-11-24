@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Redes por aprobar · Back office En Voz (maqueta)</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&family=Work+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css?v=202611240900">
+  <link rel="stylesheet" href="assets/redes.css?v=202611240900">
+</head>
+<body class="bo">
+  <div class="proto-bar" role="note"><div class="container">
+    <span><strong>Maqueta del back office</strong> · Así se vería la aprobación de publicaciones para Instagram. No publica nada.</span>
+    <a class="proto-toggle" href="index.html">Ver el sitio</a>
+  </div></div>
+
+  <div class="bo-layout">
+    <aside class="bo-side" aria-label="Menú del back office">
+      <img src="assets/logo-white.svg" alt="En Voz" class="bo-logo">
+      <p class="bo-label">Back office</p>
+      <nav>
+        <a href="#" aria-disabled="true">Editores</a>
+        <a href="#" aria-disabled="true">Categorías</a>
+        <a href="#" aria-disabled="true">Artículos</a>
+        <a href="redes.html" aria-current="page">Redes por aprobar <span class="bo-badge" id="side-count">0</span></a>
+        <a href="#" aria-disabled="true">Papelera</a>
+      </nav>
+    </aside>
+
+    <main class="bo-main">
+      <header class="bo-head">
+        <div>
+          <h1>Redes por aprobar</h1>
+          <p>Cada nota publicada genera su imagen para Instagram. Revisa, ajusta el título o el texto, y aprueba la publicación.</p>
+        </div>
+        <div class="bo-quota" aria-live="polite"><b><span id="quota">0</span> de 50</b><small>publicaciones de hoy en Instagram</small></div>
+      </header>
+
+      <div class="bo-tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-filter="pendiente">Por aprobar <span id="c-pendiente">0</span></button>
+        <button role="tab" aria-selected="false" data-filter="aprobada">Aprobadas <span id="c-aprobada">0</span></button>
+        <button role="tab" aria-selected="false" data-filter="descartada">Descartadas <span id="c-descartada">0</span></button>
+      </div>
+
+      <div id="posts" class="bo-grid" aria-live="polite"><p class="search-hint">Cargando las notas publicadas…</p></div>
+    </main>
+  </div>
+
+  <div class="bo-toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="assets/data.js?v=202611240900"></script>
+  <script src="assets/redes.js?v=202611240900"></script>
+</body>
+</html>
