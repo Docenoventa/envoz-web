@@ -244,8 +244,9 @@
     var day = t.getDay();               // 0 domingo … 6 sábado
     var mins = t.getHours() * 60 + t.getMinutes();
     var weekday = day >= 1 && day <= 5;
-    var START = 7 * 60 + 25, END = 23 * 60;
-    if (weekday && mins >= START && mins < END) return 'live';
+    var START = 7 * 60 + 25, LIVE_END = 10 * 60 + 30, END = 23 * 60;
+    if (weekday && mins >= START && mins < LIVE_END) return 'live';
+    if (weekday && mins >= LIVE_END && mins < END) return 'replay';
     if (weekday && mins >= 6 * 60 && mins < START) return 'soon:' + (7 * 60 + 30 - mins);
     var next;
     if (weekday && mins < 6 * 60) next = 'hoy a las 7:30 h';
@@ -258,7 +259,11 @@
     var isLive = st === 'live';
     var isSoon = st.indexOf('soon:') === 0;
     var player, badge;
-    if (isLive) {
+    if (st === 'replay') {
+      // Lista de subidas del canal (UU + id del canal sin "UC"): muestra primero lo más reciente
+      player = '<div class="live-player"><iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=UU' + LIVE_CHANNEL_ID.slice(2) + '" title="Mañanera de hoy, repetición" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
+      badge = '<span class="live-badge replay"><span class="dot"></span>REPETICIÓN · HOY</span>';
+    } else if (isLive) {
       player = '<div class="live-player"><iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel=' + LIVE_CHANNEL_ID + '&autoplay=1&mute=1" title="Mañanera en vivo" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
       badge = '<span class="live-badge on"><span class="dot"></span>EN VIVO</span>';
     } else if (isSoon) {
@@ -276,8 +281,9 @@
       player +
       '<div class="live-info">' + badge +
         '<h2 id="live-title"><a href="' + LIVE_URL + '" target="_blank" rel="noopener">La Mañanera del Pueblo</a></h2>' +
-        '<p>Conferencia de prensa matutina de la presidenta Claudia Sheinbaum desde Palacio Nacional. De lunes a viernes, a partir de las 7:30 h (hora del centro de México).</p>' +
-        '<a class="btn btn-red" href="' + LIVE_URL + '" target="_blank" rel="noopener">Ver en vivo en YouTube</a>' +
+        '<p>Conferencia de prensa matutina de la presidenta Claudia Sheinbaum desde Palacio Nacional. De lunes a viernes, a partir de las 7:30 h (hora del centro de México).' +
+          (st === 'replay' ? ' La transmisión de hoy ya terminó: aquí puedes ver la repetición y los videos más recientes del canal.' : '') + '</p>' +
+        '<a class="btn btn-red" href="' + (st === 'replay' ? LIVE_CHANNEL_URL : LIVE_URL) + '" target="_blank" rel="noopener">' + (st === 'replay' ? 'Ver la repetición en YouTube' : 'Ver en vivo en YouTube') + '</a>' +
         '<span class="live-source">Transmisión del canal oficial @ClaudiaSheinbaumP</span>' +
       '</div></section>';
   }

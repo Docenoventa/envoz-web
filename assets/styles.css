@@ -303,3 +303,5 @@ body.show-mejoras .page-hero.mejora { outline-offset: -4px; }
 .live-badge.soon { background: #FFD437; color: var(--navy); }
 .live-badge.soon .dot { background: var(--red); }
 .live-off .countdown { font: 700 28px var(--font-head); color: var(--white); }
+.live-badge.replay { background: rgba(255,255,255,.16); }
+.live-badge.replay .dot { background: #FFD437; }
